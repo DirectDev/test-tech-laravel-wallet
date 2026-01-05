@@ -72,6 +72,84 @@
                     </div>
                 </form>
             </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
+                <h2 class="text-xl font-bold mb-6">@lang('Recurring Transfers')</h2>
+                <form method="POST" action="{{ route('recurring-transfer') }}" class="space-y-4">
+                    @csrf
+
+                    @if (session('recurring-transfer-status') === 'success')
+                        <div class="p-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
+                            <span class="font-medium">@lang('Transfer ok!')</span>
+                        </div>
+                    @elseif (session('recurring-transfer-status') === 'error')
+                        <div class="p-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+                            <span class="font-medium">@lang('Transfer ko')</span>
+                        </div>
+                    @endif
+
+                    <div>
+                        <x-input-label for="start-date" :value="__('start-date')" />
+                        <x-text-input id="start-date"
+                                      class="block mt-1 w-full"
+                                      type="date"
+                                      name="start_date"
+                                      :value="old('start_date')"
+                                      required />
+                        <x-input-error :messages="$errors->get('start_date')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="stop-date" :value="__('stop-date')" />
+                        <x-text-input id="stop-date"
+                                      class="block mt-1 w-full"
+                                      type="date"
+                                      name="stop_date"
+                                      :value="old('stop_date')"
+                                      required />
+                        <x-input-error :messages="$errors->get('stop_date')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="frequency" :value="__('frequency')" />
+                        <x-text-input id="frequency"
+                                      class="block mt-1 w-full"
+                                      type="integer"
+                                      name="frequency"
+                                      :value="old('frequency')"
+                                      required />
+                        <x-input-error :messages="$errors->get('frequency')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="amount" :value="__('Amount (€)')" />
+                        <x-text-input id="amount"
+                                      class="block mt-1 w-full"
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      :value="old('amount')"
+                                      name="amount"
+                                      required />
+                        <x-input-error :messages="$errors->get('amount')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="reason" :value="__('Reason')" />
+                        <x-text-input id="reason"
+                                      class="block mt-1 w-full"
+                                      type="text"
+                                      :value="old('reason')"
+                                      name="reason"
+                                      required />
+                        <x-input-error :messages="$errors->get('reason')" class="mt-2" />
+                    </div>
+
+                    <div class="flex justify-end mt-4">
+                        <x-primary-button>
+                            {{ __('Save !') }}
+                        </x-primary-button>
+                    </div>
+                </form>
+            </div>
+
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
                 <h2 class="text-xl font-bold mb-6">@lang('Transactions history')</h2>
                 <table class="w-full text-sm text-left text-gray-500 border border-gray-200">
