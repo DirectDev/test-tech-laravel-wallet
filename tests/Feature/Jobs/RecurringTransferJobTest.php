@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Jobs\RecurringTransferJob;
 use App\Models\RecurringTransfer;
 use App\Models\User;
+use App\Notifications\RecurringTransferInsufficientBalance;
+use Illuminate\Support\Facades\Notification;
 
 test('job can be instantiated', function () {
     $job = new RecurringTransferJob();

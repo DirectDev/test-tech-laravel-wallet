@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\RecurringTransfer;
+use App\Notifications\RecurringTransferInsufficientBalance;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Queue\Queueable;
@@ -44,6 +45,7 @@ class RecurringTransferJob implements ShouldQueue
             }
 
             if ($transfer->user->wallet?->balance < $transfer->amount) {
+                $transfer->user->notify(new RecurringTransferInsufficientBalance($transfer));
                 continue;
             }
 
