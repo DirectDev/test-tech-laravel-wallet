@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Events\WalletUpdateEvent;
 use App\Models\Wallet;
+use App\Notifications\LowBalance;
 
 class WalletObserver
 {
@@ -21,7 +22,7 @@ class WalletObserver
     public function updated(Wallet $wallet): void
     {
         if ($wallet->balance < 100) {
-            WalletUpdateEvent::dispatch();
+            $wallet->user->notify(new LowBalance($wallet));
         }
     }
 
