@@ -149,6 +149,73 @@
                 </form>
             </div>
 
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
+                <h2 class="text-xl font-bold mb-6">@lang('My Recurring Transfers')</h2>
+                @if($recurringTransfers->isEmpty())
+                    <p class="text-gray-500">@lang('No recurring transfers yet.')</p>
+                @else
+                    <table class="w-full text-sm text-left text-gray-500 border border-gray-200">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('ID')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Start Date')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Stop Date')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Frequency (days)')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Amount')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Reason')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Status')
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($recurringTransfers as $transfer)
+                            <tr class="bg-white border-b">
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                                    {{$transfer->id}}
+                                </th>
+                                <td class="px-6 py-4">
+                                    {{$transfer->start_date->format('Y-m-d')}}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$transfer->stop_date?->format('Y-m-d') ?? '—'}}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$transfer->frequency}}
+                                </td>
+                                <td class="px-6 py-4 font-semibold">
+                                    {{Number::currency($transfer->amount, 'EUR')}}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{$transfer->reason ?? '—'}}
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if($transfer->stop_date && $transfer->stop_date->isPast())
+                                        <span class="px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-200 rounded">@lang('Ended')</span>
+                                    @elseif($transfer->start_date->isFuture())
+                                        <span class="px-2 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded">@lang('Scheduled')</span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded">@lang('Active')</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                @endif
+            </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
                 <h2 class="text-xl font-bold mb-6">@lang('Transactions history')</h2>

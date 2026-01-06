@@ -16,6 +16,8 @@ class DashboardController
 
         $balance = $request->user()->wallet?->balance ?? 0;
 
-        return view('dashboard', compact('transactions', 'balance'));
+        $recurringTransfers = $request->user()->recurringTransfers()->orderByDesc('id')->get();
+
+        return view('dashboard', compact('transactions', 'balance', 'recurringTransfers'));
     }
 }
