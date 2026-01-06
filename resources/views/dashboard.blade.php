@@ -151,6 +151,17 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-5">
                 <h2 class="text-xl font-bold mb-6">@lang('My Recurring Transfers')</h2>
+                
+                @if (session('recurring-transfer-delete-status') === 'success')
+                    <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
+                        <span class="font-medium">@lang('Recurring transfer deleted successfully!')</span>
+                    </div>
+                @elseif (session('recurring-transfer-delete-status') === 'error')
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+                        <span class="font-medium">@lang('Failed to delete recurring transfer.')</span>
+                    </div>
+                @endif
+                
                 @if($recurringTransfers->isEmpty())
                     <p class="text-gray-500">@lang('No recurring transfers yet.')</p>
                 @else
@@ -177,6 +188,9 @@
                             </th>
                             <th scope="col" class="px-6 py-3">
                                 @lang('Status')
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                @lang('Actions')
                             </th>
                         </tr>
                         </thead>
@@ -209,6 +223,15 @@
                                     @else
                                         <span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded">@lang('Active')</span>
                                     @endif
+                                </td>
+                                <td class="px-6 py-4">
+                                    <form method="POST" action="{{ route('recurring-transfer.delete', $transfer->id) }}" class="inline" onsubmit="return confirm('@lang('Are you sure you want to delete this recurring transfer?')')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900 font-medium">
+                                            @lang('Delete')
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

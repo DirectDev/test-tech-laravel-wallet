@@ -399,3 +399,86 @@ test('multiple recurring transfers are all displayed', function () {
         $response->assertSeeText((string) $transfer->frequency);
     }
 });
+
+test('dashboard displays delete button for each recurring transfer', function () {
+    $user = User::factory()->create();
+    Wallet::factory()->for($user)->create();
+
+    $transfer1 = RecurringTransfer::factory()->for($user)->create();
+    $transfer2 = RecurringTransfer::factory()->for($user)->create();
+
+    $response = actingAs($user)->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Delete')
+        ->assertSee('action="' . route('recurring-transfer.delete', $transfer1->id) . '"', false)
+        ->assertSee('action="' . route('recurring-transfer.delete', $transfer2->id) . '"', false);
+});
+
+test('can delete recurring transfer from dashboard', function () {
+    $user = User::factory()->create();
+    Wallet::factory()->for($user)->create();
+
+    $transfer = RecurringTransfer::factory()->for($user)->create([
+        'amount' => 100.00,
+        'reason' => 'To be deleted',
+    ]);
+
+    $response = actingAs($user)->delete(route('recurring-transfer.delete', $transfer->id));
+
+    $response
+        ->assertRedirect('/')
+        ->assertSessionHas('recurring-transfer-delete-status', 'success');
+
+    expect(RecurringTransfer::find($transfer->id))->toBeNull();
+});
+
+test('deleted recurring transfer no longer appears in dashboard listing', function () {
+    $user = User::factory()->create();
+    Wallet::factory()->for($user)->create();
+
+    $transfer1 = RecurringTransfer::factory()->for($user)->create([
+        'reason' => 'Keep this one',
+    ]);
+
+    $transfer2 = RecurringTransfer::factory()->for($user)->create([
+        'reason' => 'Delete this one',
+    ]);
+
+    actingAs($user)->delete(route('recurring-transfer.delete', $transfer2->id));
+
+    $response = actingAs($user)->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Keep this one')
+        ->assertDontSeeText('Delete this one');
+});
+
+test('dashboard shows delete confirmation message', function () {
+    $user = User::factory()->create();
+    Wallet::factory()->for($user)->create();
+
+    RecurringTransfer::factory()->for($user)->create();
+
+    $response = actingAs($user)->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSee('Are you sure you want to delete this recurring transfer?', false);
+});
+
+test('delete button shows appropriate styling', function () {
+    $user = User::factory()->create();
+    Wallet::factory()->for($user)->create();
+
+    RecurringTransfer::factory()->for($user)->create();
+
+    $response = actingAs($user)->get('/');
+
+    $response
+        ->assertOk()
+        ->assertSee('text-red-600', false)
+        ->assertSee('hover:text-red-900', false);
+});
