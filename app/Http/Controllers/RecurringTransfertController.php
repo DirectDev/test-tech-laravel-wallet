@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\RegisterRecurringTransfer;
 use App\Http\Requests\RecurringTranferRequest;
+use App\Jobs\RecurringTransferJob;
 use Illuminate\Http\RedirectResponse;
 
 class RecurringTransfertController
@@ -13,7 +14,7 @@ class RecurringTransfertController
     public function __invoke(RecurringTranferRequest $request, RegisterRecurringTransfer $registerRecurringTransfer): RedirectResponse
     {
         try {
-            $registerRecurringTransfer->execute(
+            $transfer = $registerRecurringTransfer->execute(
                 user: $request->user(),
                 startDate: $request->input('start_date'),
                 stopDate: $request->input('stop_date'),
@@ -21,6 +22,10 @@ class RecurringTransfertController
                 amount: (float) $request->input('amount'),
                 reason: $request->input('reason')
             );
+
+            if ($transfer->id) {
+                RecurringTransferJob::dispatch($transfer->id);
+            }
 
             return redirect()->route('dashboard')->with('recurring-transfer-status', 'success');
         } catch (\Exception $e) {

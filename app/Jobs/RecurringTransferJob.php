@@ -9,16 +9,24 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Queue\Queueable;
 
+
+/** 
+ * C'est mieux de faire 2 jobs séparés, un pour tous les transferts une fois par jour
+ * et un pour les transfert unique avec $id précisé
+*/
+
 class RecurringTransferJob implements ShouldQueue
 {
     use Queueable;
 
+    public ?int $id = null;
+
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct(?int $id = null)
     {
-        //
+        $this->id = $id;
     }
 
     /**
@@ -26,7 +34,7 @@ class RecurringTransferJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $activeTransfers = $this->getActiveRecurringTransfers();
+        $activeTransfers = $this->getActiveRecurringTransfers($this->id);
 
         // Process each active recurring transfer
         foreach ($activeTransfers as $transfer) {
@@ -62,16 +70,22 @@ class RecurringTransferJob implements ShouldQueue
      * - stop_date is null or in the future
      * - not soft deleted
      *
+     * @param int|null $id Optional ID to filter a specific recurring transfer
      * @return Collection<int, RecurringTransfer>
      */
-    public function getActiveRecurringTransfers(): Collection
+    public function getActiveRecurringTransfers(?int $id = null): Collection
     {
-        return RecurringTransfer::query()
+        $query = RecurringTransfer::query()
             ->where('start_date', '<=', now())
             ->where(function ($query) {
                 $query->whereNull('stop_date')
                     ->orWhere('stop_date', '>', now());
-            })
-            ->get();
+            });
+
+        if ($id !== null) {
+            $query->where('id', $id);
+        }
+
+        return $query->get();
     }
 }
