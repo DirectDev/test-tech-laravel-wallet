@@ -104,15 +104,16 @@
                                       class="block mt-1 w-full"
                                       type="date"
                                       name="stop_date"
-                                      :value="old('stop_date')"
-                                      required />
+                                      :value="old('stop_date')" />
                         <x-input-error :messages="$errors->get('stop_date')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="frequency" :value="__('frequency')" />
                         <x-text-input id="frequency"
                                       class="block mt-1 w-full"
-                                      type="integer"
+                                      type="number"
+                                      min="1"
+                                      step="1"
                                       name="frequency"
                                       :value="old('frequency')"
                                       required />
@@ -136,8 +137,7 @@
                                       class="block mt-1 w-full"
                                       type="text"
                                       :value="old('reason')"
-                                      name="reason"
-                                      required />
+                                      name="reason" />
                         <x-input-error :messages="$errors->get('reason')" class="mt-2" />
                     </div>
 

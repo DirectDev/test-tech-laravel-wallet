@@ -18,13 +18,28 @@ class RecurringTranferRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'start_date' => [
+                'required',
+                'date',
+                'after_or_equal:today',
+            ],
+            'stop_date' => [
+                'nullable',
+                'date',
+                'after:start_date',
+            ],
+            'frequency' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
             'amount' => [
                 'required',
                 'numeric',
                 'min:0.01',
             ],
             'reason' => [
-                'required',
+                'nullable',
                 'string',
                 'max:255',
             ],

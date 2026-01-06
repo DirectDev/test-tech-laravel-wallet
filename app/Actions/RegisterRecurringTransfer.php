@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Enums\WalletTransactionType;
-use App\Exceptions\InsufficientBalance;
+use App\Models\RecurringTransfer;
 use App\Models\User;
-use App\Models\WalletTransfer;
-use Illuminate\Support\Facades\DB;
 
 readonly class RegisterRecurringTransfer
 {
     public function __construct() {}
 
-    public function execute(User $sender, User $recipient, int $amount, string $reason): WalletTransfer
-    {
-
+    public function execute(
+        User $user,
+        string $startDate,
+        ?string $stopDate,
+        int $frequency,
+        float $amount,
+        ?string $reason
+    ): RecurringTransfer {
+        return RecurringTransfer::create([
+            'user_id' => $user->id,
+            'start_date' => $startDate,
+            'stop_date' => $stopDate,
+            'frequency' => $frequency,
+            'amount' => $amount,
+            'reason' => $reason,
+        ]);
     }
 }

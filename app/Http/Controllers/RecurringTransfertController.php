@@ -4,33 +4,27 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\PerformWalletTransfer;
-use App\Exceptions\InsufficientBalance;
+use App\Actions\RegisterRecurringTransfer;
 use App\Http\Requests\RecurringTranferRequest;
-use App\Http\Requests\SendMoneyRequest;
+use Illuminate\Http\RedirectResponse;
 
 class RecurringTransfertController
 {
-    public function __invoke(RecurringTranferRequest $request, PerformWalletTransfer $performWalletTransfer)
+    public function __invoke(RecurringTranferRequest $request, RegisterRecurringTransfer $registerRecurringTransfer): RedirectResponse
     {
-        $recipient = $request->getRecipient();
-
         try {
-            $performWalletTransfer->execute(
-                sender: $request->user(),
-                recipient: $recipient,
-                amount: $request->getAmountInCents(),
-                reason: $request->input('reason'),
+            $registerRecurringTransfer->execute(
+                user: $request->user(),
+                startDate: $request->input('start_date'),
+                stopDate: $request->input('stop_date'),
+                frequency: (int) $request->input('frequency'),
+                amount: (float) $request->input('amount'),
+                reason: $request->input('reason')
             );
 
-            return redirect()->back()
-                ->with('money-sent-status', 'success')
-                ->with('money-sent-recipient-name', $recipient->name)
-                ->with('money-sent-amount', $request->getAmountInCents());
-        } catch (InsufficientBalance $exception) {
-            return redirect()->back()->with('money-sent-status', 'insufficient-balance')
-                ->with('money-sent-recipient-name', $recipient->name)
-                ->with('money-sent-amount', $request->getAmountInCents());
+            return redirect()->route('dashboard')->with('recurring-transfer-status', 'success');
+        } catch (\Exception $e) {
+            return redirect()->route('dashboard')->with('recurring-transfer-status', 'error');
         }
     }
 }
