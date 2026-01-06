@@ -36,7 +36,7 @@ test('perform a transfer', function () {
 
     assertDatabaseHas('wallet_transactions', [
         'amount' => 100,
-        'wallet_id' => $sender->id,
+        'wallet_id' => $source->id,
         'type' => WalletTransactionType::DEBIT,
         'transfer_id' => $transfer->id,
     ]);

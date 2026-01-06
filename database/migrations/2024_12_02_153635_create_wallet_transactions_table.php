@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->foreignId('wallet_id')->constrained('wallets');
 
-            //$table->foreignId('transfer_id')->nullable()->constrained('wallet_transfers');
+            $table->foreignId('transfer_id')->nullable()->constrained('wallet_transfers');
 
             $table->integer('amount')->unsigned();
             $table->string('type');

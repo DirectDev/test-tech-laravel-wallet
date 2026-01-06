@@ -8,7 +8,7 @@ use App\Models\Wallet;
 use function Pest\Laravel\actingAs;
 
 test('dashboard page is displayed', function () {
-    $user = User::factory()->has(Wallet::factory()->richChillGuy())->create();
+    $user = User::factory()->create();
     $wallet = Wallet::factory()->richChillGuy()->for($user)->create();
 
     $response = actingAs($user)->get('/');
@@ -24,8 +24,10 @@ test('dashboard page is displayed', function () {
 });
 
 test('send money to a friend', function () {
-    $user = User::factory()->has(Wallet::factory()->richChillGuy())->create();
-    $recipient = User::factory()->has(Wallet::factory())->create();
+    $user = User::factory()->create();
+    Wallet::factory()->richChillGuy()->for($user)->create();
+    $recipient = User::factory()->create();
+    Wallet::factory()->for($recipient)->create();
 
     $response = actingAs($user)->post('/send-money', [
         'recipient_email' => $recipient->email,
@@ -52,8 +54,10 @@ test('send money to a friend', function () {
 });
 
 test('cannot send money to a friend with insufficient balance', function () {
-    $user = User::factory()->has(Wallet::factory())->create();
-    $recipient = User::factory()->has(Wallet::factory())->create();
+    $user = User::factory()->create();
+    Wallet::factory()->for($user)->create();
+    $recipient = User::factory()->create();
+    Wallet::factory()->for($recipient)->create();
 
     $response = actingAs($user)->post('/send-money', [
         'recipient_email' => $recipient->email,

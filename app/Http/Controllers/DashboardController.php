@@ -14,7 +14,7 @@ class DashboardController
 
         $transactions = $request->user()->walletTransactions();
 
-        $balance = $request->user()->wallet?->balance || 0;
+        $balance = $request->user()->wallet?->balance ?? 0;
 
         return view('dashboard', compact('transactions', 'balance'));
     }
